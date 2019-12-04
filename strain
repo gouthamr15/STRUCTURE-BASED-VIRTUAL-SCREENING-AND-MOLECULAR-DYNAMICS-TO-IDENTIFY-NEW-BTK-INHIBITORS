@@ -1,0 +1,6 @@
+strain calculation script to run in cluster
+
+
+run strain_rescore.py hits_54_64.mae -f OPLS3e -NJOBS 5 -csearch -csearch_mode MCMMLMOD -solvation WATER -HOST parallel
+
+*input file name = hits_54_64
