@@ -1,0 +1,49 @@
+##molecular dynamics with Desmond##
+###THESE SCRIPTS ARE USED FROM THE DESMOND SCHRODINGER PROGRAM AND MODIFIED FOR OUR PURPOSE
+
+
+#####command for running the MD simulation (multisim) (desmond_multisim)
+
+$SCHRODINGER/utilities/multisim -JOBNAME XXXXX -HOST parallel -maxjob 1 -cpu 24 -m XXXXX.msj -c XXXXX.cfg -description "Molecular Dynamics" XXXXXX.cms -mode umbrella -DISP ignore -o XXXXXX.cms 
+ 
+ * input.msj file
+ * input.cfg file
+ * input.cms file
+
+For repeats, you can use the XX-in.cms file generated from stage 8 of multisim. 
+
+##For minimisation, include following commands in the start (after task 1) in the input msj file
+
+minimize {
+   title                  = "Minimization with restraints on non solvent heavy atoms"
+   max_steps              = 10000
+   steepest_descent_steps = 50
+   convergence            = 0.5
+   restrain               = { atom = 'asl: (NOT ((SMARTS. \"[H]O[H]\") AND NOT (atom.i_wmap_restrain 1) ) ) AND NOT (atom.ele H)' force_constant = 5.0 }
+}
+
+
+
+## To start a simulation from the command line ## WITHOUT MULTISIM
+
+desmond -JOBNAME XXXXXXX -HOST parallel:24 -in XXXXXX.cms -c XXXXXXX.cfg
+
+## To continue failed simulation from checkpoint file
+
+desmond -JOBNAME XXXXX -HOST parallel:24 -restore XXXXX.cpt -in XXXX.cms -c XXXXXX.cfg
+
+###OR
+
+desmond -JOBNAME XXXX -HOST parallel:24 -restorE XXXXX.cptl
+
+## Extend silumlation ##
+
+$SCHRODINGER/desmond -JOBNAME XXXXXX -HOST parallel:24 -restore XXXXXXX.cpt -cfg mdsim.last_time=30000
+
+
+## merge trajectories in Schrodinger power Shell ##
+
+run trj_merge.py XXXXX-out.cms XXXXXX_trj XXXXXXXcont_trj
+
+
+##### EXAMPLE run trj_merge.py out.cms traj1 traj2 traj3 -o merged-out
